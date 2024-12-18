@@ -1,5 +1,5 @@
 # 🏔️ Alpine Linux
-![size](https://img.shields.io/docker/image-size/coralhl/alpine-base/3.20.3?color=0eb305) ![version](https://img.shields.io/docker/v/coralhl/alpine-base/3.20.3?color=eb7a09) ![pulls](https://img.shields.io/docker/pulls/coralhl/alpine-base?color=2b75d6) ![stars](https://img.shields.io/docker/stars/coralhl/alpine-base?color=e6a50e) [<img src="https://img.shields.io/badge/github-coralhl-blue?logo=github">](https://github.com/coralhl)
+![size](https://img.shields.io/docker/image-size/coralhl/alpine-base/3.21.0?color=0eb305) ![version](https://img.shields.io/docker/v/coralhl/alpine-base/3.21.0?color=eb7a09) ![pulls](https://img.shields.io/docker/pulls/coralhl/alpine-base?color=2b75d6) ![stars](https://img.shields.io/docker/stars/coralhl/alpine-base?color=e6a50e) [<img src="https://img.shields.io/badge/github-coralhl-blue?logo=github">](https://github.com/coralhl)
 
 # SYNOPSIS
 This image will give you a base Alpine image with some additional tweaks like some bins which are present by default and the mimalloc memory allocator (optimized malloc for multi threading). 

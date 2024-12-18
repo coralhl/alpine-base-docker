@@ -1,5 +1,5 @@
 # *** Build
-FROM alpine:3.20.3 as build
+FROM alpine:3.21.0 as build
 ENV MIMALLOC_VERSION=v2.1.7
 
 RUN set -ex; \
@@ -23,7 +23,7 @@ RUN set -ex; \
   make install
 
 # *** Header
-FROM alpine:3.20.3
+FROM alpine:3.21.0
 COPY --from=build /mimalloc/build/*.so.* /lib/
 ENV LD_PRELOAD=/lib/libmimalloc.so
 ENV MIMALLOC_LARGE_OS_PAGES=1
