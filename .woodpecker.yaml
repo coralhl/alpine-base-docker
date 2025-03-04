@@ -17,4 +17,4 @@ steps:
         - linux/arm64
       tags:
       - latest
-      - 3.21.0
+      - 3.21.3
