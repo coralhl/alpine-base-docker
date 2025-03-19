@@ -18,10 +18,10 @@ services:
 # DEFAULT SETTINGS
 | Parameter | Value | Description |
 | --- | --- | --- |
-| `user` | docker | user docker |
+| `user` | abc | user abc |
 | `uid` | 1000 | user id 1000 |
 | `gid` | 1000 | group id 1000 |
-| `home` | / | home directory of user docker |
+| `home` | /home/user | home directory of user abc |
 
 # ENVIRONMENT
 | Parameter | Value | Default |
@@ -36,4 +36,3 @@ services:
 * [alpine](https://alpinelinux.org)
 
 # TIPS
-    
