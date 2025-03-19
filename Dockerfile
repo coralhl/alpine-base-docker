@@ -32,19 +32,21 @@ ENV MIMALLOC_LARGE_OS_PAGES=1
 USER root
 
 # *** update image
-RUN set -ex; \
-  apk --no-cache --update add \
+RUN set -ex \
+  && apk --no-cache --update add \
     curl \
     tzdata \
-    shadow; \
-  apk --no-cache --update upgrade;
+    shadow \
+  && apk --no-cache --update upgrade
 
 RUN set -ex; \
   ln -s /lib/libmimalloc.so.* /lib/libmimalloc.so || echo "libmimalloc.so linked"
 
 # *** create user
-RUN set -ex; \
-  addgroup --gid 1000 -S docker; \
-  adduser --uid 1000 -D -S -h / -s /sbin/nologin -G docker docker;
+RUN set -ex \
+  && groupmod -g 1000 users \
+  && useradd -u 1000 -U -d /home/user -s /bin/false abc \
+  && usermod -G users abc \
+  && mkdir -p /home/user
 
-USER docker
+USER abc
