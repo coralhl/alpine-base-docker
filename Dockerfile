@@ -1,6 +1,6 @@
 # *** Build
 FROM alpine:3.21.3 as build
-ENV MIMALLOC_VERSION=v3.0.1
+ENV MIMALLOC_VERSION=v3.0.3
 
 RUN set -ex; \
   apk add --no-cache \
