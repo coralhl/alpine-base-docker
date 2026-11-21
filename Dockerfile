@@ -1,6 +1,10 @@
+ARG ALPINE_VER=3.24.4
+ARG MIMALLOC_VERSION=v2.5.3
+
 # *** Build
-FROM alpine:3.22.7 AS build
-ENV MIMALLOC_VERSION=v2.5.2
+FROM alpine:${ALPINE_VER} AS build
+ARG MIMALLOC_VERSION
+ENV MIMALLOC_VERSION=${MIMALLOC_VERSION}
 
 RUN set -ex; \
   apk add --no-cache \
@@ -23,7 +27,7 @@ RUN set -ex; \
   make install
 
 # *** Header
-FROM alpine:3.22.7
+FROM alpine:${ALPINE_VER}
 COPY --from=build /mimalloc/build/*.so.* /lib/
 ENV LD_PRELOAD=/lib/libmimalloc.so
 ENV MIMALLOC_LARGE_OS_PAGES=1

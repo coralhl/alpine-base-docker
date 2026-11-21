@@ -8,45 +8,65 @@ on:
 env:
   REGISTRY: docker.io
   IMAGE_NAME: alpine-base
-  IMAGE_TAG: "3.22.7 latest"
   IMAGE_PLATFORMS: linux/amd64,linux/arm64
+  # Актуальная ветка Alpine; 3.22.7 сохраняется для PHP 8.2
+  ALPINE_CURRENT: 3.24.4
+  ALPINE_LEGACY: 3.22.7
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v2
-      
+        uses: actions/checkout@v4
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         with:
           platforms: ${{ env.IMAGE_PLATFORMS }}
 
-      - name: Build Image
-        id: build_image_multiplatform
-        uses: coralhl/buildah-action@main
+      - name: Build current image (${{ env.ALPINE_CURRENT }}, latest)
+        id: build_current
+        # Pinned to a commit: the action has no release tags
+        uses: coralhl/buildah-action@01c17028be4c5a4429ada8abba427914d5860c40
         with:
+          dockerfile: Dockerfile
+          build_args: ALPINE_VER=${{ env.ALPINE_CURRENT }}
           image: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}
-          tags: ${{ env.IMAGE_TAG }}
+          tags: "${{ env.ALPINE_CURRENT }} latest"
           platforms: ${{ env.IMAGE_PLATFORMS }}
           push: true
           registry: ${{ env.REGISTRY }}
           registry_username: ${{ secrets.DOCKERHUB_USERNAME }}
           registry_password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Copy from DH to REG 3.22.7
-        uses: coralhl/skopeo-action@main
+      - name: Build legacy image (${{ env.ALPINE_LEGACY }})
+        id: build_legacy
+        # Pinned to a commit: the action has no release tags
+        uses: coralhl/buildah-action@01c17028be4c5a4429ada8abba427914d5860c40
         with:
-          source: docker://${{ env.REGISTRY }}/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:3.22.7
-          target: docker://${{ secrets.PRIV_REG }}/${{ secrets.PRIV_REG_USERNAME }}/${{ env.IMAGE_NAME }}:3.22.7
+          dockerfile: Dockerfile
+          build_args: ALPINE_VER=${{ env.ALPINE_LEGACY }}
+          image: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}
+          tags: ${{ env.ALPINE_LEGACY }}
+          platforms: ${{ env.IMAGE_PLATFORMS }}
+          push: true
+          registry: ${{ env.REGISTRY }}
+          registry_username: ${{ secrets.DOCKERHUB_USERNAME }}
+          registry_password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Copy from DH to REG (current)
+        uses: coralhl/skopeo-action@08f6e2f68b5ae8346cda0224144b193018ad61ba
+        with:
+          source: docker://${{ env.REGISTRY }}/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.ALPINE_CURRENT }}
+          target: docker://${{ secrets.PRIV_REG }}/${{ secrets.PRIV_REG_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.ALPINE_CURRENT }}
           source_username: ${{ secrets.DOCKERHUB_USERNAME }}
           source_password: ${{ secrets.DOCKERHUB_PASSWORD }}
           target_username: ${{ secrets.PRIV_REG_USERNAME }}
           target_password: ${{ secrets.PRIV_REG_PASSWORD }}
 
-      - name: Copy from DH to REG latest
-        uses: coralhl/skopeo-action@main
+      - name: Copy from DH to REG (latest)
+        uses: coralhl/skopeo-action@08f6e2f68b5ae8346cda0224144b193018ad61ba
         with:
           source: docker://${{ env.REGISTRY }}/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
           target: docker://${{ secrets.PRIV_REG }}/${{ secrets.PRIV_REG_USERNAME }}/${{ env.IMAGE_NAME }}:latest
@@ -54,4 +74,13 @@ jobs:
           source_password: ${{ secrets.DOCKERHUB_PASSWORD }}
           target_username: ${{ secrets.PRIV_REG_USERNAME }}
           target_password: ${{ secrets.PRIV_REG_PASSWORD }}
-  
+
+      - name: Copy from DH to REG (legacy)
+        uses: coralhl/skopeo-action@08f6e2f68b5ae8346cda0224144b193018ad61ba
+        with:
+          source: docker://${{ env.REGISTRY }}/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.ALPINE_LEGACY }}
+          target: docker://${{ secrets.PRIV_REG }}/${{ secrets.PRIV_REG_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.ALPINE_LEGACY }}
+          source_username: ${{ secrets.DOCKERHUB_USERNAME }}
+          source_password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          target_username: ${{ secrets.PRIV_REG_USERNAME }}
+          target_password: ${{ secrets.PRIV_REG_PASSWORD }}
